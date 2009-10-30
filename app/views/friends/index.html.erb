@@ -1,0 +1,19 @@
+<h1>Listing friends</h1>
+
+<table>
+  <tr>
+	<th>Gamertag</th>
+	<th>Gamerscore</th>
+	<th>Status</th>
+	<th>Description</th>
+  </tr>
+
+<% @friends.each do |friend| %>
+  <tr>
+	<td><%= link_to "#{friend.gamertag}", friend %></td>
+    <td><%= friend.gamerscore %></td>
+    <td><%= friend.presence %></td>
+    <td><%= friend.description %></td>
+  </tr>
+<% end %>
+</table>

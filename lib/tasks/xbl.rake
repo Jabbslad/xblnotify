@@ -1,29 +1,37 @@
 require 'pp'
-require 'xboxlive'
+Dir.entries("#{RAILS_ROOT}/lib").sort.each do |entry|
+  if entry =~ /.jar$/
+    require entry
+  end
+end
 
 namespace :xbl do
   desc "Update xbl statuses"
   task :update => :environment do
-    xbl = XboxLive.new
-    puts "Logging into Xbox Live"
-    xbl.login('', '')
+    session = Java::xbl::Session.new
+    puts "Logging into Xbox Live as '#{ENV['xbluser']}'"
+    session.signIn(ENV['xbluser'], ENV['xblpass'])
     puts "Fetching friends from Xbox Live"
-    friends = xbl.friends
-    friends.keys.each do |gamertag|
-      if(user = User.find_by_gamertag(gamertag))
-        user.gamerscore = friends[gamertag][:gamerscore]
-        user.presence = friends[gamertag][:presence]
-        user.description = friends[gamertag][:description]
-        if user.changed?
+    friends = session.getFriends
+    0.upto(friends.size-1) do |n|
+      friend = friends.get(n)
+      gamertag = friend.getGamerTag
+      if (existing = Friend.find_by_gamertag(gamertag))
+        existing.gamerscore = friend.getGamerScore
+        existing.presence = friend.getStatus
+        existing.description = friend.getInfo
+        if existing.changed?
           pp "Updating #{gamertag}"
-          pp user.changes
-          Notifier.deliver_status_notification("xbl: #{user.gamertag}: #{user.presence}") if user.presence_changed?
+          pp existing.changes
         end
-        user.save!
+        existing.save!
       else
         puts "Adding '#{gamertag}'"
-        User.create(friends[gamertag]) do |user|
-          user.gamertag = gamertag
+        Friend.create do |new_friend|
+          new_friend.gamertag
+          new_friend.gamerscore
+          new_friend.presence
+          new_friend.description
         end
       end
     end
@@ -32,8 +40,16 @@ namespace :xbl do
   desc "List statuses"
   task :list => :environment do
     puts "Listing Xbox Live statuses"
-    User.find(:all).each do |user|
-      pp user
+    Friend.find(:all).each do |friend|
+      pp friend
+    end
+  end
+  
+  desc "List online statuses"
+  task :listonline => :environment do
+    puts "Listing online Xbox Live statuses"
+    Friend.find_online.each do |friend|
+      pp friend
     end
   end
 end
