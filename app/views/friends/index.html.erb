@@ -3,17 +3,21 @@
 <table>
   <tr>
 	<th>Gamertag</th>
+	<th>Tile URL</th>
 	<th>Gamerscore</th>
 	<th>Status</th>
-	<th>Description</th>
+	<th>Profile URL</th>
+	<th>Info</th>
   </tr>
 
 <% @friends.each do |friend| %>
   <tr>
 	<td><%= link_to "#{friend.gamertag}", friend %></td>
+    <td><%= image_tag(friend.tile_url) %></td>
     <td><%= friend.gamerscore %></td>
-    <td><%= friend.presence %></td>
-    <td><%= friend.description %></td>
+    <td><%= friend.status %></td>
+	<td><%= link_to "#{friend.profile_url}" %></td>
+    <td><%= friend.info %></td>
   </tr>
 <% end %>
 </table>

@@ -13,16 +13,18 @@ ActiveRecord::Schema.define(:version => 20091007200909) do
 
   create_table "friends", :force => true do |t|
     t.string   "gamertag"
+    t.string   "tile_url"
     t.integer  "gamerscore"
-    t.string   "presence"
-    t.string   "description"
+    t.string   "status"
+    t.string   "profile_url"
+    t.string   "info"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "users", :force => true do |t|
     t.string   "gamertag"
-    t.integer  "gamerscore"
+    t.integer  "gamerscore",  :limit => nil
     t.string   "presence"
     t.string   "description"
     t.datetime "created_at"

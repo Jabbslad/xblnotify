@@ -16,23 +16,17 @@ namespace :xbl do
     0.upto(friends.size-1) do |n|
       friend = friends.get(n)
       gamertag = friend.getGamerTag
-      if (existing = Friend.find_by_gamertag(gamertag))
-        existing.gamerscore = friend.getGamerScore
-        existing.presence = friend.getStatus
-        existing.description = friend.getInfo
+      if (existing = Friend.find_or_create_by_gamertag(gamertag))
+        existing.tile_url = friend.getTileURL
+        existing.gamerscore = friend.getGamerScore      
+        existing.status = friend.getStatus
+        existing.profile_url = friend.getProfileURL
+        existing.info = friend.getInfo
         if existing.changed?
           pp "Updating #{gamertag}"
           pp existing.changes
         end
         existing.save!
-      else
-        puts "Adding '#{gamertag}'"
-        Friend.create do |new_friend|
-          new_friend.gamertag
-          new_friend.gamerscore
-          new_friend.presence
-          new_friend.description
-        end
       end
     end
   end
